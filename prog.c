@@ -19,7 +19,7 @@ void Systick_Handler(void){
 	__enable_irq();
 }
 
-void add_task(uint32_t task){
+int add_task(uint32_t task){
 	curStackHead -= DEFAULT_TASK_SIZE;
 	if(curStackHead<=_ebss) return -1;
 	TCB[curtid].tid = curtid;
