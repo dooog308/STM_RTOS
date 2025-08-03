@@ -21,7 +21,7 @@ void Systick_Handler(void){
 
 void add_task(uint32_t task){
 	curStackHead -= DEFAULT_TASK_SIZE;
-	if(curStackHead<=_ebss)
+	if(curStackHead<=_ebss) return -1;
 	TCB[curtid].tid = curtid;
 	TCB[curtid].sp = (uint32_t*)curStackHead;
 	
