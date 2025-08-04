@@ -12,11 +12,15 @@ extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 
 void Systick_Handler(void){
 	__disable_irq();
+	context_switch();
+	__enable_irq();
+}
+
+void context_switch(void){
 	curTCB->sp = (uint32_t*)__get_PSP();
 	schedule();
 	__set_PSP((uint32_t)curTCB->sp);
 	__set_CONTROL(__get_CONTROL()|(0X1<<1));
-	__enable_irq();
 }
 
 int add_task(uint32_t task){

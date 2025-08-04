@@ -26,6 +26,10 @@ void PRINTFI(uint32_t tx){
 extern void TEST(void);
 extern uint32_t SystemCoreClock;
 
+void yield(void){
+	__asm("SVC #0");
+}
+
 void task1(void){
 	uint32_t i=0;
 	while(1){
@@ -36,7 +40,10 @@ void task1(void){
 void task2(void){
 	uint32_t i=0;
 	while(1){
-		if(i%100000==0)PRINTFC("T2\r\n", 4);
+		if(i%100000==0){
+			yield();
+			PRINTFC("T2\r\n", 4);
+		}
 		i++;
 	}
 }

@@ -8,16 +8,18 @@ LDFLAG=-T $(LINKER_FILE)
 
 all: LED.elf
 
-LED.elf: main.o startup.o system_stm32f4xx.o test.o prog.o
+LED.elf: main.o startup.o system_stm32f4xx.o prog.o syscall.o SYSCALL.o
 	$(GXX) $(CFLAG) $(CPPFLAG) $(LDFLAG) -g $^ -o LED.elf
 main.o: main.c
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c main.c
 prog.o: prog.c prog.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c prog.c
+syscall.o: syscall.c syscall.h
+	$(GXX) $(CFLAG) $(CPPFLAG) -g -c syscall.c
+SYSCALL.o: SYSCALL.s
+	$(GXX) $(CFLAG) $(CPPFLAG) -g -c SYSCALL.s
 startup.o: startup.c
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c startup.c
-test.o: test.S
-	$(GXX) $(CFLAG) $(CPPFLAG) -g -c test.S
 system_stm32f4xx.o: vendor/CMSIS/Device/stm/Source/Templates/system_stm32f4xx.c
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c vendor/CMSIS/Device/stm/Source/Templates/system_stm32f4xx.c
 

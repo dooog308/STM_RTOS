@@ -13,6 +13,7 @@ typedef struct{
 }Tblock; 
 
 void Systick_Handler(void);
+void context_switch(void);
 int add_task(uint32_t task);
 void start_schedule(void);
 void schedule(void);
