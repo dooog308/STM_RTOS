@@ -10,11 +10,11 @@ all: LED.elf
 
 LED.elf: main.o startup.o system_stm32f4xx.o prog.o syscall.o SYSCALL.o
 	$(GXX) $(CFLAG) $(CPPFLAG) $(LDFLAG) -g $^ -o LED.elf
-main.o: main.c
+main.o: main.c usrsys.h prog.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c main.c
 prog.o: prog.c prog.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c prog.c
-syscall.o: syscall.c syscall.h
+syscall.o: syscall.c syscall.h prog.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c syscall.c
 SYSCALL.o: SYSCALL.s
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c SYSCALL.s

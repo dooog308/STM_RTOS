@@ -7,9 +7,17 @@
 #define USER_STACK_START  (STACK_START-KERNEL_SIZE)
 #define MAXTHREAD         10
 
+#define ready             0
+#define running           1
+#define block             2
+#define sleep_up          3
+#define sleep_down        4
+
 typedef struct{
-	uint8_t tid;
 	uint32_t *sp;
+	uint8_t tid;
+	uint8_t status;
+	uint32_t wait;
 }Tblock; 
 
 void Systick_Handler(void);
