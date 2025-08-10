@@ -1,17 +1,17 @@
 #ifndef __PROG
 #define __PROG
 
-#define STACK_START       (0x20000000+192*1024)
-#define KERNEL_SIZE       (50*1024)
+#include"mem.h"
+
 #define DEFAULT_TASK_SIZE (200)
-#define USER_STACK_START  (STACK_START-KERNEL_SIZE)
 #define MAXTHREAD         10
 
 #define ready             0
 #define running           1
 #define block             2
-#define sleep_up          3
-#define sleep_down        4
+#define kill              3
+#define sleep_up          4
+#define sleep_down        5
 
 typedef struct{
 	uint32_t *sp;
@@ -24,6 +24,7 @@ void Systick_Handler(void);
 void context_switch(void);
 int add_task(uint32_t task);
 void start_schedule(void);
+uint8_t che_runnable(Tblock *task);
 void schedule(void);
 
 #endif

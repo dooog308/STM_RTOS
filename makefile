@@ -8,13 +8,15 @@ LDFLAG=-T $(LINKER_FILE)
 
 all: LED.elf
 
-LED.elf: main.o startup.o system_stm32f4xx.o prog.o syscall.o SYSCALL.o
+LED.elf: main.o startup.o system_stm32f4xx.o task.o syscall.o SYSCALL.o mem.o
 	$(GXX) $(CFLAG) $(CPPFLAG) $(LDFLAG) -g $^ -o LED.elf
-main.o: main.c usrsys.h prog.h
+main.o: main.c usrsys.h task.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c main.c
-prog.o: prog.c prog.h
-	$(GXX) $(CFLAG) $(CPPFLAG) -g -c prog.c
-syscall.o: syscall.c syscall.h prog.h
+task.o: task.c task.h
+	$(GXX) $(CFLAG) $(CPPFLAG) -g -c task.c
+mem.o: mem.c mem.h
+	$(GXX) $(CFLAG) $(CPPFLAG) -g -c mem.c
+syscall.o: syscall.c syscall.h task.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c syscall.c
 SYSCALL.o: SYSCALL.s
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c SYSCALL.s

@@ -1,14 +1,16 @@
 #include<stdint.h>
-#include "prog.h"
+#include "task.h"
 #include "stm32f4xx.h"
 
 Tblock TCB[MAXTHREAD];
+Tblock DefaultTCB;
 Tblock *curTCB;
-uint8_t curtid=1;
+uint8_t curtid=0;
 uint32_t curStackHead=USER_STACK_START;
 uint32_t ticks;
 
 extern void PRINTFC(char* tx, uint8_t len);
+extern void PRINTFI(uint32_t tx);
 extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 
 void Systick_Handler(void){
@@ -16,7 +18,6 @@ void Systick_Handler(void){
 	__set_CONTROL(__get_CONTROL()&(~(0X1)));
 	ticks++;
 	if(ticks%100==0) context_switch();
-	__set_CONTROL(__get_CONTROL()&(~(0X1<<1)));
 	__set_CONTROL(__get_CONTROL()|(0X1));
 	__enable_irq();
 }
@@ -44,11 +45,11 @@ int add_task(uint32_t task){
 }
 
 void start_schedule(void){
-	TCB[0].tid = 0;
-	TCB[0].sp = (uint32_t*)USER_STACK_START;
-	TCB[0].status = ready;
-	TCB[0].wait = 0;
-	curTCB = &TCB[0];
+	DefaultTCB.tid = 0;
+	DefaultTCB.sp = (uint32_t*)USER_STACK_START;
+	DefaultTCB.status = ready;
+	DefaultTCB.wait = 0;
+	curTCB = &DefaultTCB;
 	
 	__set_PSP((uint32_t)curTCB->sp);
 	__set_CONTROL(__get_CONTROL()|(0X1<<1));
@@ -56,21 +57,26 @@ void start_schedule(void){
 	int i=0;
 	while(1){
 		i++;
-		if(i%100000==0)PRINTFC("T0\r\n",4);
-		//__set_CONTROL(__get_CONTROL()&(~(0X1<<1)));
+		//if(i%100000==0)PRINTFC("T0\r\n",4);
 	};
 }
 
+uint8_t che_runnable(Tblock *task){
+	if(task->status==sleep_up&&task->wait<ticks) 
+			return 0;
+	if(task->status==sleep_down&&task->wait>ticks) 
+			return 0;
+	if(task->status==kill)
+			return 0;
+	task->status=ready;
+	task->wait=0;
+	return 1;
+}
 void schedule(void){
 	uint8_t i=(curTCB->tid+1)%curtid;
-	if(i==0)i=1;
-	while(TCB[i].wait!=0){
-		if(TCB[i].status==sleep_up&&TCB[i].wait>=ticks
-	||TCB[i].status==sleep_down&&TCB[i].wait<=ticks){
-			TCB[i].status = running;
-			TCB[i].wait = 0;
-		}
+	while(!che_runnable(&TCB[i])){
 		i++;
+		i %= curtid;
 	}
 	curTCB = &TCB[i];
 }

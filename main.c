@@ -1,6 +1,6 @@
 #include<stdint.h>
 #include "stm32f4xx.h"
-#include "prog.h"
+#include "task.h"
 #include "usrsys.h"
 
 void GPIO_init(void);
@@ -61,15 +61,23 @@ void task4(void){
 	uint32_t i=0;
 	while(1){
 		if(i%100000==0)PRINTFC("T4\r\n", 4);
+		if(i==1000000){
+			uint8_t *tem;
+			tem = (uint8_t*)(0x08000000);
+			*tem = 20;
+		}
 		i++;
 	}
 }
+
+extern void mpu_init(void);
 
 int main(){
 	GPIO_init();
 	clock_init();
 	usart_init();
 	PRINTFC("HIHI\r\n", 6);
+	mpu_init();
 	if(i==123){
 		GPIOG->ODR |= (0X1<<13);
 		GPIOG->ODR |= (0X1<<14);

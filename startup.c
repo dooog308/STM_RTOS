@@ -1,4 +1,5 @@
 #include<stdint.h>
+#include "mem.h"
 
 #define SRAM_START             (0x20000000)
 #define SRAM_SIZE              (192*1024)
@@ -40,6 +41,7 @@ uint32_t isr_vector[ISR_VECTOR_TABLE_SIZE]__attribute__
 };
 
 extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
+extern void mpu_init(void);
 void main(void);
 
 void _default(void)
@@ -60,6 +62,7 @@ void RESET_Handler(void)
 
 	for(uint32_t i=0;i<BssSize;i++)
 		RAMbss[i] = 0;	
+	//mpu_init();
 	main();
 }
 
