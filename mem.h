@@ -3,28 +3,37 @@
 
 #include<stdint.h>
 
-#define SRAM_START        (0x20000000)
-#define FLASH_START       (0x08000000)
-#define STMPERH_START     (0x40000000)
-#define STACK_START       (SRAM_START+192*1024)
-#define KERNEL_SIZE       (32*1024)
+extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
+
+#define SRAM_START        (0x20000000U)
+#define SRAM_SIZE         (192U*1024U)
+#define SRAM_END          (SRAM_START+SRAM_SIZE)
+#define STACK_ADDRESS     (SRAM_END)
+#define FLASH_START       (0x08000000U)
+#define STMPERH_START     (0x40000000U)
+#define STACK_START       (SRAM_START+SRAM_SIZE)
+#define FREESPACE_START   ((uint32_t)&_ebss)
+#define KERNEL_SIZE       (32U*1024U)
 #define USER_STACK_START  (STACK_START-KERNEL_SIZE)
 
 #define SRAM_REGION       0
 #define TEXT_REGION       1
 #define STMPERH_REGION    2
-#define MAINSTACK_REGION  3
-#define USRSTACK_REGION   4
+#define FREE_REGION1  	  3
+#define FREE_REGION2  	  4
+#define USRSTACK_REGION   5
 
-#define SRAM_attribute  ARM_MPU_RASR_EX(0UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_NORMAL(2,2,1), 0X00UL, ARM_MPU_REGION_SIZE_256KB)
-#define TEXT_attribute  ARM_MPU_RASR_EX(0UL, ARM_MPU_AP_RO, ARM_MPU_ACCESS_NORMAL(2,2,0), 0X00UL, ARM_MPU_REGION_SIZE_2MB)
-#define STMPERH_attribute  ARM_MPU_RASR_EX(1UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_DEVICE(1), 0X00UL, ARM_MPU_REGION_SIZE_512MB)
-#define MAINSTACK_attribute  ARM_MPU_RASR(0, ARM_MPU_AP_PRIV, 0, 0, 1, 1, 0X00, ARM_MPU_REGION_SIZE_32KB)
+#define SRAM_attribute     ARM_MPU_RASR_EX(0UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_NORMAL(2,2,1), 0X00UL, ARM_MPU_REGION_SIZE_1KB)
+#define TEXT_attribute     ARM_MPU_RASR_EX(0UL, ARM_MPU_AP_RO, ARM_MPU_ACCESS_NORMAL(2,2,0), 0X00UL, ARM_MPU_REGION_SIZE_2MB)
+#define STMPERH_attribute  ARM_MPU_RASR_EX(1UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_DEVICE(1), 0X00UL, ARM_MPU_REGION_SIZE_64MB)
+#define FREE_attribute     ARM_MPU_RASR_EX(0UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_NORMAL(2,2,1), 0X00UL, ARM_MPU_REGION_SIZE_256KB)
 
-extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
+#define base_roundup(base, size)  ((base)-((base)%size))
 
 void MemoryMAFault_Handler(void);
 void HardFault_Handler(void);
+uint8_t memsize(uint32_t size);
 void mpu_init(void);
+void set_user_region(uint32_t base, uint32_t size);
 
 #endif

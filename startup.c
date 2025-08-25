@@ -1,10 +1,7 @@
 #include<stdint.h>
 #include "mem.h"
+#include "task.h"
 
-#define SRAM_START             (0x20000000)
-#define SRAM_SIZE              (192*1024)
-#define SRAM_END               (SRAM_START+SRAM_SIZE)
-#define STACK_ADDRESS          (SRAM_END)
 #define ISR_VECTOR_TABLE_SIZE  (106)
  
 void _default(void);
@@ -61,8 +58,8 @@ void RESET_Handler(void)
 	uint8_t *RAMbss=(uint8_t*)&_sbss;
 
 	for(uint32_t i=0;i<BssSize;i++)
-		RAMbss[i] = 0;	
-	//mpu_init();
+		RAMbss[i] = 0;
+	mpu_init();
 	main();
 }
 

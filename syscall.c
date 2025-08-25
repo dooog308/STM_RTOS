@@ -8,7 +8,6 @@ extern Tblock *curTCB;
 extern uint64_t ticks;
 extern void PRINTFC(char* tx, uint8_t len);
 extern void PRINTFI(uint32_t tx);
-extern void context_switch();
 
 void SVCall_CHandler(unsigned int *svc_arg){
 	unsigned int sysid=((char*)svc_arg[6])[-2];
@@ -24,7 +23,7 @@ void SVCall_CHandler(unsigned int *svc_arg){
 
 void sys_yield(void){
 	__disable_irq();
-	context_switch();
+	SCB->ICSR |= (1<<28);
 	__enable_irq();
 }
 
@@ -34,6 +33,6 @@ void sys_sleep(uint16_t time){
 	if(time+ticks<ticks) curTCB->status=sleep_down;
 	else curTCB->status=sleep_up;
 	curTCB->wait = time+ticks;
-	context_switch();
+	SCB->ICSR |= (1<<28);
 	__enable_irq();	
 }

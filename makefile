@@ -1,5 +1,5 @@
 GXX=arm-none-eabi-gcc
-CFLAG=-mcpu=cortex-m4 -mthumb -nostdlib
+CFLAG=-mcpu=cortex-m4 -mthumb -nostdlib -fomit-frame-pointer
 CPPFLAG=-DSTM32F429xx \
 		-Ivendor/CMSIS/Device/stm/Include \
 		-Ivendor/CMSIS/CMSIS/Core/Include
@@ -8,12 +8,14 @@ LDFLAG=-T $(LINKER_FILE)
 
 all: LED.elf
 
-LED.elf: main.o startup.o system_stm32f4xx.o task.o syscall.o SYSCALL.o mem.o
+LED.elf: main.o startup.o system_stm32f4xx.o task.o syscall.o SYSCALL.o mem.o context_switch.o
 	$(GXX) $(CFLAG) $(CPPFLAG) $(LDFLAG) -g $^ -o LED.elf
 main.o: main.c usrsys.h task.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c main.c
-task.o: task.c task.h
+task.o: task.o task.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c task.c
+context_switch.o: task.h context_switch.S
+	$(GXX) $(CFLAG) $(CPPFLAG) -g -c context_switch.S
 mem.o: mem.c mem.h
 	$(GXX) $(CFLAG) $(CPPFLAG) -g -c mem.c
 syscall.o: syscall.c syscall.h task.h

@@ -7,7 +7,7 @@ void GPIO_init(void);
 void clock_init(void);
 void usart_init(void);
 
-uint8_t i=123;
+uint8_t k=123;
 
 void PRINTFC(char* tx, uint8_t len){
 	while(len)
@@ -25,48 +25,53 @@ void PRINTFI(uint32_t tx){
 }
 
 extern void TEST(void);
+extern Tblock TCB[MAXTHREAD];
+extern Tblock *curTCB;
 extern uint32_t SystemCoreClock;
 
-/*void yield(void){
-	__asm("SVC #0");
-}*/
-/*void sleep(uint32_t a){
-	__asm("SVC #1");
-}*/
 void task1(void){
-	uint32_t i=0;
+	uint32_t i=0;//, num[200];
 	while(1){
-		if(i%100000==0)PRINTFC("T1\r\n", 4);
+		if(i%100000==0) PRINTFC("T1\r\n", 4);
 		i++;
 	}
 }
 void task2(void){
-	uint32_t i=0;
+	uint32_t i=0, k=0, num[70];
 	sleep(1250);
+		
 	while(1){
+		i++;
 		if(i%100000==0){
 			PRINTFC("T2\r\n", 4);
-		}
-		i++;
+	  
+	
+	//PRINTFC(" K: ", 4);
+	//PRINTFI((uint32_t)&i);
+	//PRINTFC("\r\n", 2);
+	}
 	}
 }
 void task3(void){
-	uint32_t i=0;
+	uint32_t i=0;//,  num[200];
+	uint32_t *tem;
+
 	while(1){
 		if(i%100000==0)PRINTFC("T3\r\n", 4);
 		i++;
 	}
 }
 void task4(void){
-	uint32_t i=0;
+	uint32_t i=0;//, num[200];
 	while(1){
-		if(i%100000==0)PRINTFC("T4\r\n", 4);
-		if(i==1000000){
-			uint8_t *tem;
-			tem = (uint8_t*)(0x08000000);
-			*tem = 20;
-		}
 		i++;
+		if(i%100000==0){
+				PRINTFC("T4\r\n", 4);
+//PRINTFC(" I: ", 4);
+//	PRINTFI((uint32_t)&i);
+//	PRINTFC("\r\n", 2);
+
+		}
 	}
 }
 
@@ -77,8 +82,7 @@ int main(){
 	clock_init();
 	usart_init();
 	PRINTFC("HIHI\r\n", 6);
-	mpu_init();
-	if(i==123){
+	if(k==123){
 		GPIOG->ODR |= (0X1<<13);
 		GPIOG->ODR |= (0X1<<14);
 	}
