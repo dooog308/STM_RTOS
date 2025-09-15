@@ -1,13 +1,14 @@
 #include<stdint.h>
 #include "stm32f4xx.h"
 #include "task.h"
+#include "lock.h"
 #include "usrsys.h"
 
 void GPIO_init(void);
 void clock_init(void);
 void usart_init(void);
 
-uint8_t k=123;
+uint32_t k=0;
 
 void PRINTFC(char* tx, uint8_t len){
 	while(len)
@@ -28,50 +29,62 @@ extern void TEST(void);
 extern Tblock TCB[MAXTHREAD];
 extern Tblock *curTCB;
 extern uint32_t SystemCoreClock;
-
+int ttt=0;
+spinlock lock;
 void task1(void){
-	uint32_t i=0;//, num[200];
+	uint32_t i=0,d=0,c=0;
+	init_spinlock(&lock);
+	for(int i=0;i<1000000;i++){
+			try_spinlock(&lock);
+			k++;
+			free_spinlock(&lock);
+	}
+
 	while(1){
-		if(i%100000==0) PRINTFC("T1\r\n", 4);
+		if(i%100000==0); //PRINTFC("T1\r\n", 4);
 		i++;
+		d++;
+		c++;
 	}
 }
 void task2(void){
-	uint32_t i=0, k=0, num[70];
-	sleep(1250);
-		
+	uint32_t i=0;
+	//sleep(1250);
+	for(int i=0;i<1000000;i++){
+			try_spinlock(&lock);
+			k++;
+			free_spinlock(&lock);
+	}
+	
 	while(1){
 		i++;
-		if(i%100000==0){
-			PRINTFC("T2\r\n", 4);
-	  
-	
-	//PRINTFC(" K: ", 4);
-	//PRINTFI((uint32_t)&i);
-	//PRINTFC("\r\n", 2);
-	}
 	}
 }
 void task3(void){
-	uint32_t i=0;//,  num[200];
+	uint32_t i=0;
 	uint32_t *tem;
+	for(int i=0;i<1000000;i++){
+			try_spinlock(&lock);
+			k++;
+			free_spinlock(&lock);
+	}
 
 	while(1){
-		if(i%100000==0)PRINTFC("T3\r\n", 4);
 		i++;
+		if(i%100000==0); //PRINTFC("T3\r\n", 4);
 	}
 }
 void task4(void){
-	uint32_t i=0;//, num[200];
+	uint32_t i=0;
+	for(int i=0;i<1000000;i++){
+			try_spinlock(&lock);
+			k++;
+			free_spinlock(&lock);
+	}
+
 	while(1){
 		i++;
-		if(i%100000==0){
-				PRINTFC("T4\r\n", 4);
-//PRINTFC(" I: ", 4);
-//	PRINTFI((uint32_t)&i);
-//	PRINTFC("\r\n", 2);
-
-		}
+	//	if(i%100000==0);
 	}
 }
 
@@ -86,10 +99,10 @@ int main(){
 		GPIOG->ODR |= (0X1<<13);
 		GPIOG->ODR |= (0X1<<14);
 	}
-	add_task((uint32_t)task1);
-	add_task((uint32_t)task2);
-	add_task((uint32_t)task3);
-	add_task((uint32_t)task4);
+	add_task(&task1);
+	add_task(&task2);
+	add_task(&task3);
+	add_task(&task4);
 	start_schedule();
 	while(1);
 }

@@ -8,13 +8,14 @@ extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 #define SRAM_START        (0x20000000U)
 #define SRAM_SIZE         (192U*1024U)
 #define SRAM_END          (SRAM_START+SRAM_SIZE)
+#define KERNEL_START      (SRAM_END-10*1024)
 #define STACK_ADDRESS     (SRAM_END)
 #define FLASH_START       (0x08000000U)
 #define STMPERH_START     (0x40000000U)
 #define STACK_START       (SRAM_START+SRAM_SIZE)
 #define FREESPACE_START   ((uint32_t)&_ebss)
 #define KERNEL_SIZE       (32U*1024U)
-#define USER_STACK_START  (STACK_START-KERNEL_SIZE)
+#define USER_STACK_START  (KERNEL_START-KERNEL_SIZE)
 
 #define SRAM_REGION       0
 #define TEXT_REGION       1
@@ -30,6 +31,8 @@ extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 
 #define base_roundup(base, size)  ((base)-((base)%size))
 
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
 void MemoryMAFault_Handler(void);
 void HardFault_Handler(void);
 uint8_t memsize(uint32_t size);

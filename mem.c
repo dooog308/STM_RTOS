@@ -6,6 +6,18 @@ extern void PRINTFC(char* tx, uint8_t len);
 extern void PRINTFI(uint32_t tx);
 extern Tblock *curTCB; 
 
+void BusFault_Handler(void){
+	PRINTFC("BUS FAULT id: ", 14);
+	PRINTFI(curTCB->tid);
+	PRINTFC(" bits: ", 7);
+	PRINTFI(SCB->BFAR);
+	PRINTFC("\r\n",2);
+
+	while(1);
+}
+void UsageFault_Handler(void){
+	while(1);
+}
 void HardFault_Handler(void){
 	PRINTFC("HARD FAULT\r\n", 12);
 	while(1);
@@ -45,8 +57,6 @@ void mpu_init(void){
 	ARM_MPU_SetRegionEx(STMPERH_REGION, STMPERH_START,
 		  STMPERH_attribute);
 
-	ARM_MPU_ClrRegion(6);
-	ARM_MPU_ClrRegion(7);
 
 	ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 	__enable_irq();
@@ -56,8 +66,6 @@ void set_user_region(uint32_t base, uint32_t size){
 	__disable_irq();
 	
 	ARM_MPU_ClrRegion(USRSTACK_REGION);
-	ARM_MPU_ClrRegion(FREE_REGION2);
-	ARM_MPU_ClrRegion(FREE_REGION1);	
 	
 	ARM_MPU_SetRegionEx(USRSTACK_REGION, base, ARM_MPU_RASR_EX(1UL, ARM_MPU_AP_FULL, ARM_MPU_ACCESS_NORMAL(2,2,1), 0X00UL, memsize(size)));
 

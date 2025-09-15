@@ -1,4 +1,5 @@
 #include<stdint.h>
+#include "stm32f4xx.h"
 #include "mem.h"
 #include "task.h"
 
@@ -59,6 +60,8 @@ void RESET_Handler(void)
 
 	for(uint32_t i=0;i<BssSize;i++)
 		RAMbss[i] = 0;
+	NVIC_SetPriority(PendSV_IRQn, 255);
+//	__set_PSP(KERNEL_START);
 	mpu_init();
 	main();
 }
