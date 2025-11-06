@@ -34,12 +34,6 @@ spinlock lock;
 void task1(void){
 	uint32_t i=0,d=0,c=0;
 	init_spinlock(&lock);
-	for(int i=0;i<1000000;i++){
-			try_spinlock(&lock);
-			k++;
-			free_spinlock(&lock);
-	}
-
 	while(1){
 		if(i%100000==0); //PRINTFC("T1\r\n", 4);
 		i++;
@@ -50,11 +44,6 @@ void task1(void){
 void task2(void){
 	uint32_t i=0;
 	//sleep(1250);
-	for(int i=0;i<1000000;i++){
-			try_spinlock(&lock);
-			k++;
-			free_spinlock(&lock);
-	}
 	
 	while(1){
 		i++;
@@ -63,11 +52,12 @@ void task2(void){
 void task3(void){
 	uint32_t i=0;
 	uint32_t *tem;
-	for(int i=0;i<1000000;i++){
-			try_spinlock(&lock);
-			k++;
-			free_spinlock(&lock);
-	}
+	malloc(&tem, 123);
+	PRINTFC("tem: ", 5);
+	PRINTFI((uint32_t)tem);
+	PRINTFC("\r\n", 2);
+	*tem = 10;
+	free(&tem);
 
 	while(1){
 		i++;
@@ -76,12 +66,7 @@ void task3(void){
 }
 void task4(void){
 	uint32_t i=0;
-	for(int i=0;i<1000000;i++){
-			try_spinlock(&lock);
-			k++;
-			free_spinlock(&lock);
-	}
-
+	
 	while(1){
 		i++;
 	//	if(i%100000==0);

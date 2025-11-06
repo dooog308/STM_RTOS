@@ -13,7 +13,8 @@ extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 #define FLASH_START       (0x08000000U)
 #define STMPERH_START     (0x40000000U)
 #define STACK_START       (SRAM_START+SRAM_SIZE)
-#define FREESPACE_START   ((uint32_t)&_ebss)
+#define HEAP_START        ((uint32_t)&_ebss)
+#define HEAP_SIZE         (10*1024)
 #define KERNEL_SIZE       (32U*1024U)
 #define USER_STACK_START  (KERNEL_START-KERNEL_SIZE)
 
@@ -31,6 +32,13 @@ extern uint32_t _etext , _sdata, _edata, _sbss, _ebss;
 
 #define base_roundup(base, size)  ((base)-((base)%size))
 
+typedef struct h_node{
+	uint32_t size;
+	uint32_t addr;
+	struct h_node *next;
+}heap_node;
+
+
 void BusFault_Handler(void);
 void UsageFault_Handler(void);
 void MemoryMAFault_Handler(void);
@@ -38,5 +46,7 @@ void HardFault_Handler(void);
 uint8_t memsize(uint32_t size);
 void mpu_init(void);
 void set_user_region(uint32_t base, uint32_t size);
+uint32_t find_space(uint32_t size);
+void free_space(uint32_t addr);
 
 #endif

@@ -5,6 +5,7 @@
 extern void PRINTFC(char* tx, uint8_t len);
 extern void PRINTFI(uint32_t tx);
 extern Tblock *curTCB; 
+heap_node FreeSpaceHead;
 
 void BusFault_Handler(void){
 	PRINTFC("BUS FAULT id: ", 14);
@@ -59,6 +60,11 @@ void mpu_init(void){
 
 
 	ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+
+	FreeSpaceHead.size = HEAP_SIZE;
+	FreeSpaceHead.addr = HEAP_START;
+	FreeSpaceHead.next = 0;
+   
 	__enable_irq();
 }
 
@@ -72,4 +78,28 @@ void set_user_region(uint32_t base, uint32_t size){
 	__enable_irq();
 	__DSB();
 	__ISB();
+}
+uint32_t find_space(uint32_t size){
+	uint32_t addr = FreeSpaceHead.addr;
+	heap_node *node = (heap_node*)addr;
+	node->size = size;
+	node->addr = addr;
+	node->next = 0;
+
+	FreeSpaceHead.addr += (size+sizeof(heap_node));
+
+	PRINTFC("addr: ", 6);
+	PRINTFI(addr+sizeof(heap_node));
+	PRINTFC("\r\n", 2);
+	
+	return addr+sizeof(heap_node);
+}
+void free_space(uint32_t addr){
+	heap_node *tem = (heap_node*)(addr-sizeof(heap_node));
+	PRINTFC("size: ", 6);
+	PRINTFI(tem->size);
+	PRINTFC(" addr: ", 7);
+	PRINTFI(tem->addr);
+	PRINTFC("\r\n", 2);
+	
 }
